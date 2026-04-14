@@ -6,7 +6,14 @@ import java.net.URL;
 
 public class AiHttpUtil {
 
-    private static final String API_KEY = "sk-eb31ab13f66b448f9be308fd560155d7"; //  填你的key
+    private static String API_KEY;
+
+
+    public static void setApiKey(String key) {
+        API_KEY = key;
+    }
+
+
 
     public static String chat(String msg) {
         try {
