@@ -4,6 +4,13 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+/**
+ * 类描述：
+ *
+ * @author LiuWangHui
+ * @version 1.0.0
+ * @date 2026/04/14 15:11:27
+ */
 public class AiHttpUtil {
 
     private static String API_KEY;
