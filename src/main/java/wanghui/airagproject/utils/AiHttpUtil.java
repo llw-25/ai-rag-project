@@ -4,78 +4,46 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-/**
- * 类描述：
- *
- * @author LiuWangHui
- * @version 1.0.0
- * @date 2026/04/14 15:11:27
- */
 public class AiHttpUtil {
 
-    private static String API_KEY;
-
-
-    public static void setApiKey(String key) {
-        API_KEY = key;
-    }
-
-
-
-    public static String chat(String msg) {
+    public static String post(String urlStr, String apiKey, String body) {
         try {
-            URL url = new URL("https://api.deepseek.com/v1/chat/completions");
+            URL url = new URL(urlStr);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Content-Type", "application/json");
-            conn.setRequestProperty("Authorization", "Bearer " + API_KEY);
+            conn.setRequestProperty("Authorization", "Bearer " + apiKey);
+            conn.setConnectTimeout(15000);
+            conn.setReadTimeout(15000);
             conn.setDoOutput(true);
 
-            // 🔥 Prompt（你可以改）
-            String jsonInput = "{\n" +
-                    "  \"model\": \"deepseek-chat\",\n" +
-                    "  \"messages\": [\n" +
-                    "    {\"role\": \"system\", \"content\": \"你是一个Java面试官，请专业回答问题\"},\n" +
-                    "    {\"role\": \"user\", \"content\": \"" + msg + "\"}\n" +
-                    "  ]\n" +
-                    "}";
-
-            OutputStream os = conn.getOutputStream();
-            os.write(jsonInput.getBytes());
-            os.flush();
-            os.close();
-
-            BufferedReader br = new BufferedReader(
-                    new InputStreamReader(conn.getInputStream(), "utf-8"));
-
-            StringBuilder response = new StringBuilder();
-            String line;
-
-            while ((line = br.readLine()) != null) {
-                response.append(line.trim());
+            // 发送请求
+            try (OutputStream os = conn.getOutputStream()) {
+                os.write(body.getBytes("utf-8"));
             }
 
-            br.close();
+            int code = conn.getResponseCode();
+            InputStream is = (code >= 200 && code < 300)
+                    ? conn.getInputStream()
+                    : conn.getErrorStream();
 
-//            return response.toString(); // 👉 先返回原始JSON
-            String res = response.toString();
-
-            // 👉 提取 content
-            int start = res.indexOf("\"content\":\"") + 11;
-            int end = res.indexOf("\"", start);
-
-            if (start > 10 && end > start) {
-                return res.substring(start, end)
-                        .replace("\\n", "\n")
-                        .replace("\\\"", "\"");
+            if (is == null) {
+                return "请求失败：stream为null，HTTP code=" + code;
             }
 
-            return "解析失败：" + res;
+            // ✅ 核心修改点（防卡死）
+            byte[] bytes = is.readAllBytes();
+            String response = new String(bytes, "utf-8");
+
+            System.out.println("HTTP状态码：" + code);
+            System.out.println("返回内容：" + response);
+
+            return response;
 
         } catch (Exception e) {
             e.printStackTrace();
-            return "调用AI失败：" + e.getMessage();
+            return "请求异常：" + e.getMessage();
         }
     }
 }

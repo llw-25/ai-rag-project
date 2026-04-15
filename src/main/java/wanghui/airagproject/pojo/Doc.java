@@ -14,4 +14,5 @@ import lombok.Data;
 public class Doc {
     private Integer id;
     private String content;
+    private String embedding;
 }

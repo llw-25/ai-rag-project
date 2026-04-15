@@ -15,7 +15,7 @@ mybatis:
 logging:
   level:
     wanghui.airagproject: debug
-#    切分的文件块大小
+# 切分的文件块大小
 rag:
   chunk-size: 200
   overlap: 50
