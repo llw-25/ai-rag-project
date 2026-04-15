@@ -3,6 +3,8 @@ package wanghui.airagproject.pojo;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 /**
  * 类描述：文档实体类
  *
@@ -12,7 +14,9 @@ import lombok.Data;
  */
 @Data
 public class Doc {
-    private Integer id;
+    private Long id;
     private String content;
     private String embedding;
+    private Long docId;
+    private LocalDateTime createTime;
 }

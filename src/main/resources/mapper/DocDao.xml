@@ -5,9 +5,9 @@
 
 <mapper namespace="wanghui.airagproject.dao.DocDao">
 
-    <insert id="insert">
-        INSERT INTO doc_chunk(content,create_time)
-        VALUES (#{content},now())
+    <insert id="insert" parameterType="wanghui.airagproject.pojo.Doc">
+        INSERT INTO doc_chunk(content, embedding, create_time)
+        VALUES (#{content}, #{embedding}, now())
     </insert>
 
 </mapper>

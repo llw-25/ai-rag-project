@@ -25,6 +25,8 @@ public class DocService {
      * 文档入库（RAG完整流程）
      */
     public void save(String content) {
+        // 生成一个文档ID（简单版）
+        long docId = System.currentTimeMillis();
 
         // 1 文本切分
         List<String> chunks = splitter.split(content);
@@ -46,10 +48,10 @@ public class DocService {
                 doc.setContent(chunk);
                 doc.setEmbedding(embeddingJson);
 
-                // 👉 如果你后面做多文档，可以加 docId
+                //  如果你后面做多文档，可以加 docId
                 // doc.setDocId(xxx);
 
-                // 6️⃣ 入库
+                // 6 入库
                 docDao.insert(doc);
 
             } catch (Exception e) {
