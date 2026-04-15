@@ -22,12 +22,12 @@
 ## 当前进度
 - [x] AI接口接入
 - [x] 基础项目结构
-- [ ] 文档入库
-- [ ] 向量化（Embedding）
+- [x] 文档入库
+- [x] 向量化（Embedding）
 - [ ] 相似度检索
 - [ ] RAG问答
 
 ## 启动方式
 1. 配置 `application-local.yml`
 2. 填写 API Key
-3. 启动 SpringBoot怎么创建。md文档
+3. 启动 SpringBoot

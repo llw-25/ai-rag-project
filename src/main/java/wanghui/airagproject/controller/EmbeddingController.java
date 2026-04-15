@@ -7,6 +7,13 @@ import wanghui.airagproject.service.EmbeddingService;
 
 import java.util.List;
 
+/**
+ * 类描述：向量化接口
+ *
+ * @author LiuWangHui
+ * @version 1.0.0
+ * @date 2026/04/15 14:25:05
+ */
 @RestController
 public class EmbeddingController {
 
