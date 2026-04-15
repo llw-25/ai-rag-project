@@ -11,8 +11,11 @@ spring:
 mybatis:
   mapper-locations: classpath:mapper/*.xml
   type-aliases-package: wanghui.airagproject.pojo
-
+#日志分析
 logging:
   level:
     wanghui.airagproject: debug
-
+#    切分的文件块大小
+rag:
+  chunk-size: 200
+  overlap: 50
