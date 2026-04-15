@@ -9,5 +9,9 @@
         INSERT INTO doc_chunk(content, embedding, create_time)
         VALUES (#{content}, #{embedding}, now())
     </insert>
+    <select id="selectAll" resultType="wanghui.airagproject.pojo.Doc">
+        SELECT id, content, embedding
+        FROM doc_chunk
+    </select>
 
 </mapper>

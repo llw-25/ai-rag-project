@@ -3,6 +3,8 @@ package wanghui.airagproject.dao;
 import org.apache.ibatis.annotations.Mapper;
 import wanghui.airagproject.pojo.Doc;
 
+import java.util.List;
+
 /**
  * 类描述：插入逻辑
  *
@@ -13,7 +15,8 @@ import wanghui.airagproject.pojo.Doc;
 @Mapper
 public interface DocDao {
 
-        void insert(Doc doc);
+        int insert(Doc doc);
+        List<Doc> selectAll();
 
 
 }

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import wanghui.airagproject.dao.DocDao;
 import wanghui.airagproject.pojo.Doc;
 import wanghui.airagproject.rag.splitter.TextSplitter;
+import wanghui.airagproject.utils.CosineSimilarityUtil;
 
 import java.util.List;
 
@@ -22,44 +23,82 @@ public class DocService {
     private EmbeddingService embeddingService;
 
     /**
-     * 文档入库（RAG完整流程）
+     * 保存文档（RAG索引流程）
      */
     public void save(String content) {
-        // 生成一个文档ID（简单版）
-        long docId = System.currentTimeMillis();
-
-        // 1 文本切分
+        // 1. 文本分割
         List<String> chunks = splitter.split(content);
 
-        System.out.println("切分块数：" + chunks.size());
-
-        // 2遍历 chunk
+        // 2. 向量化 + 存储
         for (String chunk : chunks) {
+            // 2.1 生成向量
+            List<Float> vector = embeddingService.embed(chunk);
 
-            try {
-                // 3 调 embedding
-                List<Float> vector = embeddingService.embed(chunk);
-
-                // 4 转 JSON（存数据库）
-                String embeddingJson = JSON.toJSONString(vector);
-
-                // 5 构造对象
-                Doc doc = new Doc();
-                doc.setContent(chunk);
-                doc.setEmbedding(embeddingJson);
-
-                //  如果你后面做多文档，可以加 docId
-                // doc.setDocId(xxx);
-
-                // 6 入库
-                docDao.insert(doc);
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                System.out.println(" 某个 chunk 处理失败：" + chunk);
+            if (vector == null) {
+                throw new RuntimeException("embedding 生成失败");
             }
+
+            // 2.2 转换为JSON字符串
+            String vectorJson = JSON.toJSONString(vector);
+
+            // 2.3 创建Doc对象
+            Doc doc = new Doc();
+            doc.setContent(chunk);
+            doc.setEmbedding(vectorJson);
+
+            // 2.4 保存到数据库
+            docDao.insert(doc);
+        }
+    }
+
+    /**
+     * 查询（RAG核心）
+     */
+    public List<Doc> search(String query) {
+
+        // 1. 查询向量
+        List<Float> queryVector = embeddingService.embed(query);
+
+        if (queryVector == null) {
+            throw new RuntimeException("query embedding 生成失败");
         }
 
-        System.out.println(" 文档入库完成");
+        // 2. 查数据库
+        List<Doc> docs = docDao.selectAll();
+
+        // 3. 相似度计算 + 排序
+        return docs.stream()
+
+                // 过滤脏数据
+                .filter(doc -> doc.getEmbedding() != null)
+
+                .map(doc -> {
+                    try {
+                        List<Float> docVector =
+                                JSON.parseArray(doc.getEmbedding(), Float.class);
+
+                        if (docVector == null) return null;
+
+                        double score = CosineSimilarityUtil
+                                .cosineSimilarity(queryVector, docVector);
+
+                        doc.setScore(score);
+                        return doc;
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return null;
+                    }
+                })
+
+                .filter(doc -> doc != null)
+
+                // 排序（倒序）
+                .sorted((a, b) -> Double.compare(b.getScore(), a.getScore()))
+
+                // TopK
+                .limit(3)
+
+                .toList();
     }
 }
