@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI RAG Project Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>AI RAG Project Dashboard</h1>
+    </header>
+    <main>
+        <section id="chat-interface">
+            <h2>Chat Interface</h2>
+            <div class="chat-box">
+                <!-- Chat messages will go here -->
+            </div>
+            <input type="text" id="chat-input" placeholder="Type your message here...">
+            <button id="send-btn">Send</button>
+        </section>
+        <section id="document-management">
+            <h2>Document Management</h2>
+            <button id="upload-doc">Upload Document</button>
+            <div class="doc-list">
+                <!-- List of documents will go here -->
+            </div>
+        </section>
+        <section id="project-statistics">
+            <h2>Project Statistics</h2>
+            <div class="stats">
+                <p>Total Messages: <span id="total-msg">0</span></p>
+                <p>Total Documents: <span id="total-doc">0</span></p>
+                <p>Total Projects: <span id="total-proj">0</span></p>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2026 AI RAG Project</p>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>
