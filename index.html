@@ -3,41 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI RAG Project Dashboard</title>
+    <title>AI RAG Project</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
 </head>
 <body>
-    <header>
-        <h1>AI RAG Project Dashboard</h1>
-    </header>
-    <main>
-        <section id="chat-interface">
-            <h2>Chat Interface</h2>
-            <div class="chat-box">
-                <!-- Chat messages will go here -->
-            </div>
-            <input type="text" id="chat-input" placeholder="Type your message here...">
-            <button id="send-btn">Send</button>
-        </section>
-        <section id="document-management">
-            <h2>Document Management</h2>
-            <button id="upload-doc">Upload Document</button>
-            <div class="doc-list">
-                <!-- List of documents will go here -->
-            </div>
-        </section>
-        <section id="project-statistics">
-            <h2>Project Statistics</h2>
-            <div class="stats">
-                <p>Total Messages: <span id="total-msg">0</span></p>
-                <p>Total Documents: <span id="total-doc">0</span></p>
-                <p>Total Projects: <span id="total-proj">0</span></p>
-            </div>
-        </section>
-    </main>
-    <footer>
-        <p>&copy; 2026 AI RAG Project</p>
-    </footer>
-    <script src="script.js"></script>
+    <div id="chat-container">
+        <h1>Chat with AI</h1>
+        <div id="chat-box"></div>
+        <input type="text" id="user-input" placeholder="Type your message...">
+        <button id="send-btn">Send</button>
+    </div>
+
+    <div id="document-management">
+        <h2>Document Management</h2>
+        <form id="doc-form">
+            <input type="text" id="doc-title" placeholder="Document Title" required>
+            <textarea id="doc-content" placeholder="Document Content" required></textarea>
+            <button type="submit">Add Document</button>
+        </form>
+        <button id="search-docs-btn">Search Documents</button>
+        <div id="doc-results"></div>
+    </div>
+
+    <script>
+        const apiUrl = '/api/chat';
+
+        document.getElementById('send-btn').addEventListener('click', async () => {
+            const userInput = document.getElementById('user-input').value;
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ message: userInput })
+            });
+            const data = await response.json();
+            document.getElementById('chat-box').innerHTML += `<div>${data.reply}</div>`;
+            document.getElementById('user-input').value = '';
+        });
+
+        document.getElementById('doc-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('doc-title').value;
+            const content = document.getElementById('doc-content').value;
+            await fetch('/api/doc/add', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ title, content })
+            });
+            document.getElementById('doc-form').reset();
+        });
+
+        document.getElementById('search-docs-btn').addEventListener('click', async () => {
+            const response = await fetch('/api/doc/search');
+            const docs = await response.json();
+            const resultsDiv = document.getElementById('doc-results');
+            resultsDiv.innerHTML = '';
+            docs.forEach(doc => {
+                resultsDiv.innerHTML += `<div>${doc.title}: ${doc.content}</div>`;
+            });
+        });
+    </script>
 </body>
 </html>
